@@ -58,6 +58,7 @@ struct media_player_callback {
 					uint64_t uid, void *user_data);
 	int (*total_items)(struct media_player *mp, const char *name,
 						void *user_data);
+    int (*force_update_properties)(struct media_player *mp, void *user_data);
 };
 
 struct media_player *media_player_controller_create(const char *path,

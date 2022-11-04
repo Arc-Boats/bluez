@@ -437,6 +437,23 @@ static gboolean get_playlist(const GDBusPropertyTable *property,
 	return TRUE;
 }
 
+static DBusMessage *media_player_force_update_properties(DBusConnection *conn, DBusMessage *msg,
+                                      void *data)
+{
+    struct media_player *mp = data;
+    struct player_callback *cb = mp->cb;
+    int err;
+
+    if (cb->cbs->force_update_properties == NULL)
+        return btd_error_not_supported(msg);
+
+    err = cb->cbs->force_update_properties(mp, cb->user_data);
+    if (err < 0)
+        return btd_error_failed(msg, strerror(-err));
+
+    return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+}
+
 static DBusMessage *media_player_play(DBusConnection *conn, DBusMessage *msg,
 								void *data)
 {
@@ -756,6 +773,7 @@ static const GDBusMethodTable media_player_methods[] = {
 	{ GDBUS_METHOD("Hold", GDBUS_ARGS({"avc_key", "y"}), NULL,
 							media_player_hold) },
 	{ GDBUS_METHOD("Release", NULL, NULL, media_player_release) },
+    { GDBUS_METHOD("ForceUpdateProperties", NULL, NULL, media_player_force_update_properties) },
 	{ }
 };
 

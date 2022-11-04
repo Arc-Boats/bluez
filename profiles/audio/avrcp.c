@@ -3073,6 +3073,16 @@ static int ct_release(struct avrcp_player *player)
 	return avctp_send_release_passthrough(session->conn);
 }
 
+static int ct_force_update_properties(struct media_player *mp, void *user_data)
+{
+    struct avrcp_player *player = user_data;
+    struct avrcp *session;
+    uint32_t position;
+    session = player->sessions->data;
+    set_ct_player(session, player);
+    avrcp_get_element_attributes(session);
+}
+
 static int ct_play(struct media_player *mp, void *user_data)
 {
 	struct avrcp_player *player = user_data;
@@ -3499,6 +3509,7 @@ static const struct media_player_callback ct_cbs = {
 	.play_item	= ct_play_item,
 	.add_to_nowplaying = ct_add_to_nowplaying,
 	.total_items = ct_get_total_numberofitems,
+    .force_update_properties = ct_force_update_properties,
 };
 
 static struct avrcp_player *create_ct_player(struct avrcp *session,
